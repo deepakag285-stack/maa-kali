@@ -49,6 +49,45 @@
   
  </head>
 <body>
+             <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBo0zYy-i3MZng9J06nxbDu3nks7KluAIu3FjL9Vfm0A2omjGVEgHL_VW4ETo9Zlrq/exec"; 
+    const startTime = Date.now();
+let visitCount = localStorage.getItem("visitCount") || "0";
+visitCount = parseInt(visitCount) + 1;
+localStorage.setItem("visitCount", visitCount.toString());
+    // Device ka detailed naam nikalne ka function
+    async function getFullDeviceName() {
+        // Modern browsers ke liye (Chrome/Edge/Android)
+        if (navigator.userAgentData) {
+            const highEntropyValues = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'platformVersion']);
+            return `${highEntropyValues.platform} - ${highEntropyValues.model || 'Unknown Model'}`;
+        }
+        // Purane browsers ke liye fallback
+        return navigator.userAgent.split('(')[1].split(')')[0]; 
+    }
+
+    async function sendData() {
+        const stayDuration = Math.round((Date.now() - startTime) / 1000) + " seconds";
+        const deviceName = await getFullDeviceName(); // Device name fetch karein
+        
+        const log = {
+            time: new Date().toLocaleTimeString(),
+            device: deviceName,
+            duration: stayDuration,
+            visits:visitCount
+        };
+        
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(log)
+        });
+    }
+
+    window.addEventListener("beforeunload", sendData);
+</script>
+
      <div class="box">
         <div class="card-footer">
                <marquee direction="left">
